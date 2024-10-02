@@ -2,21 +2,26 @@ const list = document.getElementById('todo-list');
 const itemCountSpan = document.getElementById('item-count');
 const uncheckedCountSpan = document.getElementById('unchecked-count');
 
-let todos = [
+let todos = JSON.parse(localStorage.getItem('todos')) || [
     { id: 1, text: 'Вивчити HTML', completed: true },
     { id: 2, text: 'Вивчити CSS', completed: true },
     { id: 3, text: 'Вивчити JavaScript', completed: false },
 ];
 
+function saveTodos() {
+    localStorage.setItem('todos', JSON.stringify(todos));
+}
+
 function newTodo() {
     const todoText = prompt('Введіть нове завдання:');
     if (todoText) {
         const newTodo = {
-            id: todos.length + 1,
+            id: todos.length ? todos[todos.length - 1].id + 1 : 1,
             text: todoText,
             completed: false,
         };
         todos.push(newTodo);
+        saveTodos();
         render();
         updateCounter();
     }
@@ -33,7 +38,7 @@ function renderTodo(todo) {
 }
 
 function render() {
-    list.innerHTML = ''; 
+    list.innerHTML = '';
     const todoItems = todos.map(renderTodo).join('');
     list.insertAdjacentHTML('beforeend', todoItems);
 }
@@ -46,6 +51,7 @@ function updateCounter() {
 
 function deleteTodo(id) {
     todos = todos.filter(todo => todo.id !== id);
+    saveTodos(); 
     render();
     updateCounter();
 }
@@ -54,6 +60,7 @@ function checkTodo(id) {
     const todo = todos.find(todo => todo.id === id);
     if (todo) {
         todo.completed = !todo.completed;
+        saveTodos(); 
         render();
         updateCounter();
     }
